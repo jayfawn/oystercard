@@ -6,6 +6,7 @@ class Oystercard
   MAX_BALANCE = 90
 
   def initialize
+    @in_use = false
     @balance = 0
   end
 
@@ -19,9 +20,22 @@ class Oystercard
     @balance -= value
   end
 
+  def touch_in
+    @in_use = true
+  end
+
+  def touch_out
+    @in_use = false
+  end
+  
+  def in_journey?
+    @in_use
+  end
+
   private
 
   def max_reached?(value)
     @balance + value > MAX_BALANCE
   end
+
 end

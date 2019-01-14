@@ -28,4 +28,19 @@ describe Oystercard do
       expect { subject.deduct 2 }.to change { subject.balance }.by(-2)
     end
   end
+
+
+  describe '#touch_in' do
+    it "should update a card as 'in use' when touching in" do
+      subject.touch_in
+      expect(subject.in_journey?).to eq true
+    end
+  end
+
+  describe '#touch_out' do
+    it "should update a card as ' not in use' when touching out" do
+      subject.touch_out
+      expect(subject.in_journey?).to eq false
+    end
+  end
 end

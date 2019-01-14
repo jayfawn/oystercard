@@ -51,6 +51,20 @@ describe 'user_stories' do
   # In order to get through the barriers
   # As a customer
   # I need to touch in and out
+
+  it "should update a card as 'in use' when touching in" do
+    newcard = Oystercard.new
+    newcard.touch_in
+    expect(newcard.in_journey?).to eq true
+  end
+
+  it "should update a card as 'not in use' when touching in" do
+    newcard = Oystercard.new
+    newcard.touch_in
+    newcard.touch_out
+    expect(newcard.in_journey?).to eq false
+  end
+  
   #
   # In order to pay for my journey
   # As a customer
