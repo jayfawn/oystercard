@@ -16,9 +16,16 @@ describe Oystercard do
     end
 
     it 'should not allow user to top up if the end balance is > Max balance' do
-      msg = "Maximum balance £#{Oystercard::MAX_BALANCE} will be exceeded"
+      msg = "Max balance £#{Oystercard::MAX_BALANCE} will be exceeded"
       subject.top_up(87)
       expect { subject.top_up(5) }.to raise_error msg
+    end
+  end
+
+  describe '#deduct' do
+    it 'should allow a value to be deducted from the card' do
+      subject.top_up(5)
+      expect { subject.deduct 2 }.to change { subject.balance }.by(-2)
     end
   end
 end

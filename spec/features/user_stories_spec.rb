@@ -30,7 +30,7 @@ describe 'user_stories' do
   # I don't want to put too much money on my card
 
   it 'should not allow the customer to top up over Maximum balance' do
-    msg = "Maximum balance £#{Oystercard::MAX_BALANCE} will be exceeded"
+    msg = "Max balance £#{Oystercard::MAX_BALANCE} will be exceeded"
     newcard = Oystercard.new
     newcard.top_up(87)
     expect { newcard.top_up(5) }.to raise_error msg
@@ -39,6 +39,14 @@ describe 'user_stories' do
   # In order to pay for my journey
   # As a customer
   # I need my fare deducted from my card
+
+  it 'should deduct a value from the card' do
+    newcard = Oystercard.new
+    newcard.top_up(5)
+    newcard.deduct(2)
+    expect(newcard.balance).to eq(3)
+  end
+
   #
   # In order to get through the barriers
   # As a customer
