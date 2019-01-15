@@ -3,6 +3,9 @@
 require 'oystercard'
 
 describe Oystercard do
+
+  let(:station) { double :station }
+
   describe '#initialize' do
     it 'should initialize with a balance of zero' do
       expect(subject.balance).to eq(0)
@@ -22,23 +25,21 @@ describe Oystercard do
     end
   end
 
-  describe '#deduct' do
-    it 'should allow a value to be deducted from the card' do
-      subject.top_up(5)
-      expect { subject.deduct 2 }.to change { subject.balance }.by(-2)
-    end
-  end
-
-
   describe '#touch_in' do
     it "should update a card as 'in use' when touching in" do
       subject.top_up(5)
-      subject.touch_in
+      subject.touch_in(station)
       expect(subject.in_journey?).to eq true
     end
 
     it "should raise an error if attempting to touch when balance too low" do
-      expect { subject.touch_in }.to raise_error "Cannot begin journey: insufficient funds"
+      expect { subject.touch_in(station) }.to raise_error "Cannot begin journey: insufficient funds"
+    end
+
+    it "should store the entry station when touching in" do
+      subject.top_up(5)
+      subject.touch_in(station)
+      expect(subject.entry_station).to eq station
     end
   end
 
@@ -46,6 +47,19 @@ describe Oystercard do
     it "should update a card as 'not in use' when touching out" do
       subject.touch_out
       expect(subject.in_journey?).to eq false
+    end
+
+    it 'should deduct the fare when touching out' do
+      subject.top_up(5)
+      subject.touch_in(station)
+      expect { subject.touch_out }.to change{ subject.balance }.by(-1)
+    end
+
+    it 'should forget the entry station on touch out' do
+      subject.top_up(5)
+      subject.touch_in(station)
+      subject.touch_out
+      expect(subject.entry_station).to eq nil
     end
   end
 end
