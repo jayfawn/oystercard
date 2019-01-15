@@ -47,29 +47,35 @@ describe 'user_stories' do
     expect(newcard.balance).to eq(3)
   end
 
-  #
+
   # In order to get through the barriers
   # As a customer
   # I need to touch in and out
 
   it "should update a card as 'in use' when touching in" do
     newcard = Oystercard.new
+    newcard.top_up(5)
     newcard.touch_in
     expect(newcard.in_journey?).to eq true
   end
 
-  it "should update a card as 'not in use' when touching in" do
+  it "should update a card as 'not in use' when touching out" do
     newcard = Oystercard.new
+    newcard.top_up(5)
     newcard.touch_in
     newcard.touch_out
     expect(newcard.in_journey?).to eq false
   end
-  
+
   #
   # In order to pay for my journey
   # As a customer
   # I need to have the minimum amount for a single journey
-  #
+  it 'should have a minimum amount for a single journey' do
+    newcard = Oystercard.new
+    expect { newcard.touch_in }.to raise_error("Cannot begin journey: insufficient funds")
+  end
+
   # In order to pay for my journey
   # As a customer
   # I need to pay for my journey when it's complete

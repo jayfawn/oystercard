@@ -32,13 +32,18 @@ describe Oystercard do
 
   describe '#touch_in' do
     it "should update a card as 'in use' when touching in" do
+      subject.top_up(5)
       subject.touch_in
       expect(subject.in_journey?).to eq true
+    end
+
+    it "should raise an error if attempting to touch when balance too low" do
+      expect { subject.touch_in }.to raise_error "Cannot begin journey: insufficient funds"
     end
   end
 
   describe '#touch_out' do
-    it "should update a card as ' not in use' when touching out" do
+    it "should update a card as 'not in use' when touching out" do
       subject.touch_out
       expect(subject.in_journey?).to eq false
     end
