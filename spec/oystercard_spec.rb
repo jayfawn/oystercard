@@ -4,7 +4,9 @@ require 'oystercard'
 
 describe Oystercard do
 
-  let(:station) { double :station }
+  let(:entry_station) { double :station }
+  let(:exit_station) { double :station }
+  let(:journey) { { entry_station: entry_station, exit_station: exit_station } }
 
   describe '#initialize' do
     it 'should initialize with a balance of zero' do
@@ -28,38 +30,46 @@ describe Oystercard do
   describe '#touch_in' do
     it "should update a card as 'in use' when touching in" do
       subject.top_up(5)
-      subject.touch_in(station)
+      subject.touch_in(:station)
       expect(subject.in_journey?).to eq true
     end
 
-    it "should raise an error if attempting to touch when balance too low" do
-      expect { subject.touch_in(station) }.to raise_error "Cannot begin journey: insufficient funds"
+    it 'should raise an error if attempting to touch when balance too low' do
+      no_fund = 'Cannot begin journey: insufficient funds'
+      expect { subject.touch_in(:station) }.to raise_error no_fund
     end
 
-    it "should store the entry station when touching in" do
+    it 'should store the entry station when touching in' do
       subject.top_up(5)
-      subject.touch_in(station)
-      expect(subject.entry_station).to eq station
+      subject.touch_in(:station)
+      expect(subject.entry_station).to eq :station
     end
   end
 
   describe '#touch_out' do
     it "should update a card as 'not in use' when touching out" do
-      subject.touch_out
+      subject.touch_out(:station)
       expect(subject.in_journey?).to eq false
     end
 
     it 'should deduct the fare when touching out' do
       subject.top_up(5)
-      subject.touch_in(station)
-      expect { subject.touch_out }.to change{ subject.balance }.by(-1)
+      subject.touch_in(:station)
+      expect { subject.touch_out(:station) }.to change { subject.balance }.by(-1)
     end
 
     it 'should forget the entry station on touch out' do
       subject.top_up(5)
-      subject.touch_in(station)
-      subject.touch_out
+      subject.touch_in(:station)
+      subject.touch_out(:station)
       expect(subject.entry_station).to eq nil
+    end
+
+    it 'should add the journey to journey history' do
+      subject.top_up(5)
+      subject.touch_in(entry_station)
+      subject.touch_out(exit_station)
+      expect(subject.journey_history).to include(journey)
     end
   end
 end
