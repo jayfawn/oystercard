@@ -1,6 +1,6 @@
 require 'station'
 
-  describe 'Station' do
+  describe Station do
     it 'should have a name associated with it when station object is created' do
       station = Station.new('Old Street', 1)
       expect(station.name).to eq 'Old Street'

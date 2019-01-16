@@ -29,46 +29,15 @@ describe 'user_stories' do
       expect { @newcard.top_up(5) }.to raise_error msg
     end
 
-    it "should update a card as 'in use' when touching in" do
-      @newcard.top_up(5)
-      @newcard.touch_in(:entry_station)
-      expect(@newcard.in_journey?).to eq true
-    end
-
-    it "should update a card as 'not in use' when touching out" do
-      @newcard.top_up(5)
-      @newcard.touch_in(:entry_station)
-      @newcard.touch_out(:exit_station)
-      expect(@newcard.in_journey?).to eq false
-    end
-
     it 'should have a minimum amount for a single journey' do
       ins_funds = 'Cannot begin journey: insufficient funds'
       expect { @newcard.touch_in(:entry_station) }.to raise_error ins_funds
     end
 
     it 'should deduct the fare when touching out' do
+      @newcard.top_up(10)
+      @newcard.touch_in(:entry_station)
       expect { @newcard.touch_out(:exit_station) }.to change { @newcard.balance }.by(-3)
-    end
-
-    it 'should store the entry station when touching in' do
-      @newcard.top_up(5)
-      @newcard.touch_in(:entry_station)
-      expect(@newcard.entry_station).to eq :entry_station
-    end
-
-    it 'should forget the entry station when touching out' do
-      @newcard.top_up(5)
-      @newcard.touch_in(:entry_station)
-      @newcard.touch_out(:exit_station)
-      expect(@newcard.entry_station).to eq nil
-    end
-
-    it 'should enable us to see a list of all journeys' do
-      @newcard.top_up(5)
-      @newcard.touch_in(:entry_station)
-      @newcard.touch_out(:exit_station)
-      expect(@newcard.journey_history).to include(journey)
     end
   end
 
