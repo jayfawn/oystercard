@@ -1,59 +1,54 @@
 # frozen_string_literal: true
-
+require_relative 'journey'
 require_relative 'station'
 
 # This is the Oystercard class
 class Oystercard
-  attr_reader :balance, :entry_station, :exit_station, :journey_history
-  MAX_BALANCE = 90
-  MIN_BALANCE = 1
-  MIN_CHARGE = 3
+  attr_reader :balance, :journey_history, :journey
 
-  def initialize
-    @in_use = false
+  MAX_BALANCE = 90
+  MIN_BALANCE = 5
+
+  def initialize(journey = Journey.new)
     @balance = 0
-    #move to journey class
-    @entry_station = nil
-    @exit_station = nil
-    #
+    @journey = journey
     @journey_history = []
   end
 
   def top_up(value)
-    raise "Max balance £#{MAX_BALANCE} will be exceeded" if max_reached?(value)
-
+    max_reached?(value)
     @balance += value
   end
 
   def touch_in(entry_station)
-    raise 'Cannot begin journey: insufficient funds' if @balance < MIN_BALANCE
-
-    @entry_station = entry_station
+    complete_journey unless @journey.entry_station.nil?
+    sufficient_funds
+    @journey.update_entry_station(entry_station)
   end
 
   def touch_out(exit_station)
-    deduct(MIN_CHARGE)
-    @exit_station = exit_station
-    update_journey_history
-  end
-
-  #move to journey?
-  def in_journey?
-    !@entry_station != true
-  end
-
-  #partially move to journey
-  def update_journey_history
-    journey = { entry_station: @entry_station, exit_station: @exit_station }
-    @journey_history << journey
-    @entry_station = nil
-    @exit_station = nil
+    @journey.update_exit_station(exit_station)
+    complete_journey
   end
 
   private
 
+  def sufficient_funds
+    raise 'Cannot begin journey: insufficient funds' if @balance < MIN_BALANCE
+  end
+
+  def complete_journey
+    deduct(@journey.fare)
+    update_journey_history
+  end
+
+  def update_journey_history
+    @journey_history << @journey
+    @journey = Journey.new
+  end
+
   def max_reached?(value)
-    @balance + value > MAX_BALANCE
+    raise "Max balance £#{MAX_BALANCE} will be exceeded" if @balance + value > MAX_BALANCE
   end
 
   def deduct(value)

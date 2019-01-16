@@ -1,3 +1,4 @@
+require 'station'
 
   describe 'Station' do
     it 'should have a name associated with it when station object is created' do
